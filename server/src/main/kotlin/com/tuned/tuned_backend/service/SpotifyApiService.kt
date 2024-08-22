@@ -13,6 +13,7 @@ import org.springframework.http.*
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.util.UriComponentsBuilder
+import java.time.Instant
 
 @Service
 class SpotifyApiService @Autowired constructor(
@@ -47,7 +48,7 @@ class SpotifyApiService @Autowired constructor(
     fun handleAuthorizationCode(code: String): String {
         val tokenResponse = exchangeCodeForTokens(code)
         val spotifyUserId = getSpotifyUserId(tokenResponse.accessToken)
-        saveSpotifyToken(spotifyUserId, tokenResponse)
+        saveOrUpdateSpotifyToken(spotifyUserId, tokenResponse)
         return tokenResponse.accessToken
     }
 
@@ -56,7 +57,7 @@ class SpotifyApiService @Autowired constructor(
             ?: throw RuntimeException("No token found for user $userId")
 
         val tokenResponse = refreshAccessToken(spotifyToken.refreshToken)
-        saveSpotifyToken(userId, tokenResponse)
+        saveOrUpdateSpotifyToken(userId, tokenResponse)
     }
 
     private fun exchangeCodeForTokens(code: String): TokenResponse {
@@ -96,15 +97,24 @@ class SpotifyApiService @Autowired constructor(
             ?: throw RuntimeException("Failed to refresh token")
     }
 
-    private fun saveSpotifyToken(userId: String, tokenResponse: TokenResponse) {
-        val spotifyToken = SpotifyToken(
-            userId = userId,
-            accessToken = tokenResponse.accessToken,
-            refreshToken = tokenResponse.refreshToken,
-            expiresIn = tokenResponse.expiresIn,
-            tokenType = tokenResponse.tokenType
-        )
-        spotifyTokenRepository.save(spotifyToken)
+    private fun saveOrUpdateSpotifyToken(userId: String, tokenResponse: TokenResponse) {
+        spotifyTokenRepository.findByUserId(userId).let { existingToken ->
+            val spotifyToken = existingToken?.apply {
+                accessToken = tokenResponse.accessToken
+                refreshToken = tokenResponse.refreshToken
+                expiresIn = tokenResponse.expiresIn
+                tokenType = tokenResponse.tokenType
+                updatedAt = Instant.now()
+            } ?: SpotifyToken(
+                userId = userId,
+                accessToken = tokenResponse.accessToken,
+                refreshToken = tokenResponse.refreshToken,
+                expiresIn = tokenResponse.expiresIn,
+                tokenType = tokenResponse.tokenType,
+                updatedAt = Instant.now()
+            )
+            spotifyTokenRepository.save(spotifyToken)
+        }
     }
 
     private fun getSpotifyUserId(accessToken: String): String {
