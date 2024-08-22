@@ -8,10 +8,10 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.tuned.tuned_backend.model.SpotifyToken
 import com.tuned.tuned_backend.model.TokenResponse
 import com.tuned.tuned_backend.repository.SpotifyTokenRepository
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.util.UriComponentsBuilder
 
 @Service
 class SpotifyApiService @Autowired constructor(
@@ -105,5 +105,52 @@ class SpotifyApiService @Autowired constructor(
             tokenType = tokenResponse.tokenType
         )
         spotifyTokenRepository.save(spotifyToken)
+    }
+
+    fun searchTracks(
+        query: String,
+        market: String?,
+        limit: Int?,
+        offset: Int?,
+        includeExternal: String?
+    ): ResponseEntity<String> {
+        val userId = 1L // Replace this with actual user identification logic
+        val spotifyToken = spotifyTokenRepository.findByUserId(userId)
+            ?: throw RuntimeException("No token found for user $userId")
+
+        val url = UriComponentsBuilder.fromHttpUrl("$spotifyApiBaseUrl/search")
+            .queryParam("q", query)
+            .queryParam("type", "track")
+            .apply {
+                market?.let { queryParam("market", it) }
+                limit?.let { queryParam("limit", it) }
+                offset?.let { queryParam("offset", it) }
+                includeExternal?.let { queryParam("include_external", it) }
+            }
+            .build()
+            .toUriString()
+
+        val headers = HttpHeaders().apply {
+            setBearerAuth(spotifyToken.accessToken)
+        }
+
+        val request = HttpEntity<String>(headers)
+
+        return try {
+            val response = restTemplate.exchange(url, HttpMethod.GET, request, String::class.java)
+            ResponseEntity.ok(response.body)
+        } catch (e: HttpClientErrorException) {
+            if (e.statusCode == HttpStatus.UNAUTHORIZED) {
+                // Token might be expired, try refreshing
+                refreshToken(userId)
+                // Retry the request with the new token
+                headers.setBearerAuth(spotifyTokenRepository.findByUserId(userId)!!.accessToken)
+                val newRequest = HttpEntity<String>(headers)
+                val newResponse = restTemplate.exchange(url, HttpMethod.GET, newRequest, String::class.java)
+                ResponseEntity.ok(newResponse.body)
+            } else {
+                ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
+            }
+        }
     }
 }
