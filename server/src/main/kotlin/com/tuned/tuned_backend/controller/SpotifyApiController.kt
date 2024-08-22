@@ -36,4 +36,15 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token refresh failed: ${e.message}")
         }
     }
+
+    @GetMapping("/search")
+    fun searchTracks(
+        @RequestParam query: String,
+        @RequestParam(required = false) market: String?,
+        @RequestParam(required = false) limit: Int?,
+        @RequestParam(required = false) offset: Int?,
+        @RequestParam(required = false) includeExternal: String?
+    ): ResponseEntity<String> {
+        return spotifyApiService.searchTracks(query, market, limit, offset, includeExternal)
+    }
 }
