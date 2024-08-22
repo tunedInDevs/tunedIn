@@ -28,7 +28,7 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
     }
 
     @GetMapping("/refresh")
-    fun refreshToken(@RequestParam userId: Long): ResponseEntity<String> {
+    fun refreshToken(@RequestParam userId: String): ResponseEntity<String> {
         return try {
             spotifyApiService.refreshToken(userId)
             ResponseEntity.ok("Token refreshed successfully")
@@ -39,12 +39,13 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
 
     @GetMapping("/search")
     fun searchTracks(
+        @RequestParam userId: String,
         @RequestParam query: String,
         @RequestParam(required = false) market: String?,
         @RequestParam(required = false) limit: Int?,
         @RequestParam(required = false) offset: Int?,
         @RequestParam(required = false) includeExternal: String?
     ): ResponseEntity<String> {
-        return spotifyApiService.searchTracks(query, market, limit, offset, includeExternal)
+        return spotifyApiService.searchTracks(userId, query, market, limit, offset, includeExternal)
     }
 }

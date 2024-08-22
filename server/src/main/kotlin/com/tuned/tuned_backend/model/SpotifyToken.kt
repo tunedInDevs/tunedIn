@@ -9,13 +9,13 @@ import jakarta.persistence.Id
 data class SpotifyToken(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    val userId: Long,
+    val userId: String,
     var accessToken: String,
     var refreshToken: String,
     var expiresIn: Int,
     var tokenType: String
 ) {
-    constructor() : this(0,0,"","",0,"") {
+    constructor() : this(0,"","","",0,"") {
 
     }
 }
