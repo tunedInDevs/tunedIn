@@ -4,13 +4,30 @@ import axios from 'axios';
 import SearchBar from '../../components/SearchBar';
 import TrackItem from '../../components/TrackItem';
 
+const userId = '31eforplcs33bpa476sc4sdnm6ca'; // Example user ID
+
 export default function Search() {
     const [query, setQuery] = useState('');
     const [tracks, setTracks] = useState<any[]>([]);
+    const [ratedTracks, setRatedTracks] = useState<string[]>([]);
     const market = 'US';
     const limit = 20;
     const offset = 0;
     const includeExternal = 'audio';
+
+    useEffect(() => {
+        // Fetch user's rated tracks
+        const fetchRatedTracks = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/users/${userId}/rated-tracks`);
+                const ratedTrackIds = response.data.map((track: { spotifyTrackId: string }) => track.spotifyTrackId);
+                setRatedTracks(ratedTrackIds);
+            } catch (error) {
+                console.error('Error fetching rated tracks:', error);
+            }
+        };
+        fetchRatedTracks();
+    }, []);
 
     useEffect(() => {
         if (query) {
@@ -18,7 +35,7 @@ export default function Search() {
                 try {
                     const response = await axios.get('http://localhost:8080/api/spotify/search', {
                         params: {
-                            userId: '31eforplcs33bpa476sc4sdnm6ca',
+                            userId,
                             query,
                             market,
                             limit,
@@ -26,7 +43,8 @@ export default function Search() {
                             includeExternal
                         }
                     });
-                    console.log('Search Response:', response.data.tracks.items);
+
+                    // No filtering, just set all the tracks returned by the search
                     setTracks(response.data.tracks.items);
                 } catch (error) {
                     console.error('Error during search:', error);
@@ -36,6 +54,24 @@ export default function Search() {
             searchTracks();
         }
     }, [query]);
+
+
+    const handleAddTrack = async (trackId: string) => {
+        try {
+            await axios.post(`http://localhost:8080/api/users/${userId}/rated-tracks`, null, {
+                params: { spotifyTrackId: trackId }
+            });
+            console.log('Track added:', trackId);
+
+            // Properly update the ratedTracks state
+            setRatedTracks((prevRatedTracks) => [...prevRatedTracks, trackId]);
+
+            // Optional: Log the updated state right after setting it
+            console.log('Updated ratedTracks:', [...ratedTracks, trackId]);
+        } catch (error) {
+            console.error('Error adding track:', error);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -47,10 +83,13 @@ export default function Search() {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <TrackItem
+                        id={item.id}
                         title={item.name}
                         artist={item.artists[0].name}
                         albumCover={item.album.images[0].url}
                         duration={item.duration_ms}
+                        isAdded={ratedTracks.includes(item.id)}
+                        onAddTrack={handleAddTrack}
                     />
                 )}
                 ListEmptyComponent={<Text>No results found</Text>}

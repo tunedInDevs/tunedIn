@@ -2,20 +2,23 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
-interface TrackItemProps {
+interface TrackItemWithDeleteProps {
     id: string;
     title: string;
     artist: string;
     albumCover: string;
     duration: number;  // duration in milliseconds
-    isAdded: boolean;
-    onAddTrack: (trackId: string) => void;
+    onDeleteTrack: (trackId: string) => void;
 }
 
-const TrackItem: React.FC<TrackItemProps> = ({ id, title, artist, albumCover, duration, isAdded, onAddTrack }) => {
+const TrackItemWithDelete: React.FC<TrackItemWithDeleteProps> = ({ id, title, artist, albumCover, duration, onDeleteTrack }) => {
     // Convert duration from milliseconds to mm:ss
     const minutes = Math.floor(duration / 60000);
     const seconds = ((duration % 60000) / 1000).toFixed(0);
+
+    const handleDeleteClick = () => {
+        onDeleteTrack(id);
+    };
 
     return (
         <View style={styles.container}>
@@ -29,13 +32,9 @@ const TrackItem: React.FC<TrackItemProps> = ({ id, title, artist, albumCover, du
                     {minutes}:{seconds < 10 ? '0' : ''}{seconds}
                 </Text>
                 <View style={styles.divider} />
-                {isAdded ? (
-                    <MaterialIcons name="check" size={24} color="#1DB954" />
-                ) : (
-                    <TouchableOpacity style={styles.button} onPress={() => onAddTrack(id)}>
-                        <MaterialIcons name="add" size={24} color="#fff" />
-                    </TouchableOpacity>
-                )}
+                <TouchableOpacity style={styles.button} onPress={handleDeleteClick}>
+                    <MaterialIcons name="delete" size={24} color="#fff" />
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -75,7 +74,7 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: '#1DB954',
+        backgroundColor: '#FF6347',  // Tomato color for delete button
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -89,4 +88,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TrackItem;
+export default TrackItemWithDelete;
