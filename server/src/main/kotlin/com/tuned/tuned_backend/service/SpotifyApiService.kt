@@ -8,7 +8,9 @@ import org.springframework.web.client.RestTemplate
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.tuned.tuned_backend.model.SpotifyToken
 import com.tuned.tuned_backend.model.TokenResponse
+import com.tuned.tuned_backend.model.User
 import com.tuned.tuned_backend.repository.SpotifyTokenRepository
+import com.tuned.tuned_backend.repository.UserRepository
 import org.springframework.http.*
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.HttpClientErrorException
@@ -18,7 +20,8 @@ import java.time.Instant
 @Service
 class SpotifyApiService @Autowired constructor(
     private val restTemplate: RestTemplate,
-    private val spotifyTokenRepository: SpotifyTokenRepository
+    private val spotifyTokenRepository: SpotifyTokenRepository,
+    private val userRepository: UserRepository
 ) {
 
     @Value("\${spotify.client.id}")
@@ -35,8 +38,6 @@ class SpotifyApiService @Autowired constructor(
 
     private val spotifyApiBaseUrl = "https://api.spotify.com/v1"
 
-    private val mapper = jacksonObjectMapper()
-
     fun getAuthorizationUrl(): String {
         return "https://accounts.spotify.com/authorize" +
                 "?client_id=$clientId" +
@@ -49,6 +50,7 @@ class SpotifyApiService @Autowired constructor(
         val tokenResponse = exchangeCodeForTokens(code)
         val spotifyUserId = getSpotifyUserId(tokenResponse.accessToken)
         saveOrUpdateSpotifyToken(spotifyUserId, tokenResponse)
+        saveOrUpdateUser(spotifyUserId)
         return tokenResponse.accessToken
     }
 
@@ -114,6 +116,13 @@ class SpotifyApiService @Autowired constructor(
                 updatedAt = Instant.now()
             )
             spotifyTokenRepository.save(spotifyToken)
+        }
+    }
+
+    private fun saveOrUpdateUser(userId: String) {
+        if (!userRepository.existsById(userId)) {
+            val newUser = User(id = userId, username = "Spotify User") // TODO: You might want to fetch the actual username from Spotify API
+            userRepository.save(newUser)
         }
     }
 
