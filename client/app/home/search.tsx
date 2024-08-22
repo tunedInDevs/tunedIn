@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import axios from 'axios';
 import SearchBar from '../../components/SearchBar';
+import TrackItem from '../../components/TrackItem';
 
 export default function Search() {
-    const userId = "sinistercode"
     const [query, setQuery] = useState('');
-    const market = 'US';  // Default market value, you can change this or make it dynamic
-    const limit = 5;     // Default limit value, you can change this or make it dynamic
-    const offset = 0;     // Default offset value, you can change this or make it dynamic
-    const includeExternal = 'audio';  // Default includeExternal value, you can change this or make it dynamic
+    const [tracks, setTracks] = useState<any[]>([]);
+    const market = 'US';
+    const limit = 20;
+    const offset = 0;
+    const includeExternal = 'audio';
 
     useEffect(() => {
         if (query) {
@@ -17,7 +18,7 @@ export default function Search() {
                 try {
                     const response = await axios.get('http://localhost:8080/api/spotify/search', {
                         params: {
-                            userId,
+                            userId: '31eforplcs33bpa476sc4sdnm6ca',
                             query,
                             market,
                             limit,
@@ -25,7 +26,8 @@ export default function Search() {
                             includeExternal
                         }
                     });
-                    console.log('Search Response:', response.data);
+                    console.log('Search Response:', response.data.tracks.items);
+                    setTracks(response.data.tracks.items);
                 } catch (error) {
                     console.error('Error during search:', error);
                 }
@@ -37,8 +39,23 @@ export default function Search() {
 
     return (
         <View style={styles.container}>
-            <SearchBar query={query} setQuery={setQuery} />
-            <Text>Search Page</Text>
+            <View style={styles.searchBarContainer}>
+                <SearchBar query={query} setQuery={setQuery} />
+            </View>
+            <FlatList
+                data={tracks}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <TrackItem
+                        title={item.name}
+                        artist={item.artists[0].name}
+                        albumCover={item.album.images[0].url}
+                        duration={item.duration_ms}
+                    />
+                )}
+                ListEmptyComponent={<Text>No results found</Text>}
+                contentContainerStyle={styles.listContent}
+            />
         </View>
     );
 }
@@ -46,8 +63,15 @@ export default function Search() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 50,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
+    },
+    searchBarContainer: {
+        height: 60, // Fixed height for the search bar
+        paddingHorizontal: 16,
+        justifyContent: 'center',
+        backgroundColor: '#fff',
+    },
+    listContent: {
+        paddingHorizontal: 16,
     },
 });
