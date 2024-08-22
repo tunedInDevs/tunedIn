@@ -48,4 +48,14 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
     ): ResponseEntity<String> {
         return spotifyApiService.searchTracks(userId, query, market, limit, offset, includeExternal)
     }
+
+    @GetMapping("/track/{trackId}")
+    fun getTrack(@PathVariable trackId: String, @RequestParam userId: String): ResponseEntity<String> {
+        return try {
+            val trackInfo = spotifyApiService.getTrack(userId, trackId)
+            ResponseEntity.ok(trackInfo)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch track: ${e.message}")
+        }
+    }
 }
