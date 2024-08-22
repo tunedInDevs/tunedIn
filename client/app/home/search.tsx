@@ -14,12 +14,14 @@ export default function Search() {
         if (query) {
             const searchTracks = async () => {
                 try {
-                    const response = await axios.post('http://localhost:8080/api/spotify/search', {
-                        query,
-                        market,
-                        limit,
-                        offset,
-                        includeExternal,
+                    const response = await axios.get('http://localhost:8080/api/spotify/search', {
+                        params: {
+                            query,
+                            market,
+                            limit,
+                            offset,
+                            includeExternal
+                        }
                     });
                     console.log('Search Response:', response.data);
                 } catch (error) {
