@@ -4,6 +4,7 @@ import axios from 'axios';
 import SearchBar from '../../components/SearchBar';
 
 export default function Search() {
+    const userId = "sinistercode"
     const [query, setQuery] = useState('');
     const market = 'US';  // Default market value, you can change this or make it dynamic
     const limit = 5;     // Default limit value, you can change this or make it dynamic
@@ -16,6 +17,7 @@ export default function Search() {
                 try {
                     const response = await axios.get('http://localhost:8080/api/spotify/search', {
                         params: {
+                            userId,
                             query,
                             market,
                             limit,
