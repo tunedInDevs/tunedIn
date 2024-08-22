@@ -182,6 +182,31 @@ class SpotifyApiService @Autowired constructor(
             }
         }
     }
+
+    fun getTrack(userId: String, trackId: String): String {
+        val spotifyToken = spotifyTokenRepository.findByUserId(userId)
+            ?: throw RuntimeException("No token found for user $userId")
+
+        val url = "https://api.spotify.com/v1/tracks/$trackId"
+
+        val headers = HttpHeaders().apply {
+            set("Authorization", "Bearer ${spotifyToken.accessToken}")
+        }
+
+        val entity = HttpEntity<String>(headers)
+
+        try {
+            val response = restTemplate.exchange(url, HttpMethod.GET, entity, String::class.java)
+
+            if (response.statusCode != HttpStatus.OK) {
+                throw Exception("Failed to fetch track: ${response.body}")
+            }
+
+            return response.body ?: throw Exception("Response body is null")
+        } catch (e: Exception) {
+            throw Exception("Error fetching track: ${e.message}")
+        }
+    }
 }
 
 data class SpotifyUserResponse(
