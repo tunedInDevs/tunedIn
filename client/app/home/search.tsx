@@ -44,12 +44,8 @@ export default function Search() {
                         }
                     });
 
-                    // Filter out tracks that are already in the ratedTracks list
-                    const filteredTracks = response.data.tracks.items.filter(
-                        (track: { id: string }) => !ratedTracks.includes(track.id)
-                    );
-
-                    setTracks(filteredTracks);
+                    // No filtering, just set all the tracks returned by the search
+                    setTracks(response.data.tracks.items);
                 } catch (error) {
                     console.error('Error during search:', error);
                 }
@@ -57,7 +53,8 @@ export default function Search() {
 
             searchTracks();
         }
-    }, [query, ratedTracks]);
+    }, [query]);
+
 
     const handleAddTrack = async (trackId: string) => {
         try {
