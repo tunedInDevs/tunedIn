@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface SpotifyTokenRepository : JpaRepository<SpotifyToken, Long> {
-    fun findByUserId(userId: Long): SpotifyToken?
+interface SpotifyTokenRepository : JpaRepository<SpotifyToken, String> {
+    fun findByUserId(userId: String): SpotifyToken?
 }
