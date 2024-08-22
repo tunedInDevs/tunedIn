@@ -1,17 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import axios from 'axios';
 import SearchBar from '../../components/SearchBar';
 
 export default function Search() {
     const [query, setQuery] = useState('');
+    const market = 'US';  // Default market value, you can change this or make it dynamic
+    const limit = 5;     // Default limit value, you can change this or make it dynamic
+    const offset = 0;     // Default offset value, you can change this or make it dynamic
+    const includeExternal = 'audio';  // Default includeExternal value, you can change this or make it dynamic
 
     useEffect(() => {
-        console.log('Current query:', query);
+        if (query) {
+            const searchTracks = async () => {
+                try {
+                    const response = await axios.post('http://localhost:8080/api/spotify/search', {
+                        query,
+                        market,
+                        limit,
+                        offset,
+                        includeExternal,
+                    });
+                    console.log('Search Response:', response.data);
+                } catch (error) {
+                    console.error('Error during search:', error);
+                }
+            };
+
+            searchTracks();
+        }
     }, [query]);
 
     return (
         <View style={styles.container}>
             <SearchBar query={query} setQuery={setQuery} />
+            <Text>Search Page</Text>
         </View>
     );
 }
