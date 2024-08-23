@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Linking } from 'react-native';
+import { View, Linking, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 
 interface LinkingEvent {
@@ -7,7 +7,6 @@ interface LinkingEvent {
 }
 
 const SpotifyAuthCallback: React.FC = () => {
-    const [authStatus, setAuthStatus] = useState<string>('Waiting for authentication...');
 
     useEffect(() => {
         const handleDeepLink = async (event: LinkingEvent) => {
@@ -17,16 +16,17 @@ const SpotifyAuthCallback: React.FC = () => {
                 if (code) {
                     try {
                         const response = await axios.get<string>(`http://localhost:8080/api/spotify/callback?code=${code}`);
-                        setAuthStatus('Authentication successful: ' + response.data);
+                        window.location.href = "http://localhost:8081/home";
+                        console.log("Authentication Sucessful: ", response.data)
                     } catch (error) {
                         if (axios.isAxiosError(error)) {
-                            setAuthStatus('Authentication failed: ' + error.message);
+                            console.log('Authentication failed: ' + error.message);
                         } else {
-                            setAuthStatus('An unexpected error occurred');
+                            console.log('An unexpected error occurred');
                         }
                     }
                 } else {
-                    setAuthStatus('No authorization code found in the URL');
+                    console.log('No authorization code found in the URL');
                 }
             }
         };
@@ -49,7 +49,7 @@ const SpotifyAuthCallback: React.FC = () => {
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>{authStatus}</Text>
+            <ActivityIndicator size="large" color="#0000ff" />
         </View>
     );
 };
