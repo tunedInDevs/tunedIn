@@ -1,6 +1,3 @@
-# Activate local files
-spring.profiles.active=local
-
 spring.datasource.url=jdbc:sqlite:${user.dir}/target/tuned_users.db
 spring.datasource.driver-class-name=org.sqlite.JDBC
 spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
@@ -14,5 +11,5 @@ spring.jpa.show-sql=true
 # Spotify API Configuration
 spotify.client.id=YOUR_SPOTIFY_CLIENT_ID
 spotify.client.secret=YOUR_SPOTIFY_CLIENT_SECRET
-spotify.redirect.uri=YOUR_SPOTIFY_REDIRECT_URI
+spotify.redirect.uri=http://localhost:8081/callback
 spotify.api.base-url=https://api.spotify.com/v1

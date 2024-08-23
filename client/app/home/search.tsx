@@ -5,7 +5,7 @@ import SearchBar from '../../components/SearchBar';
 import TrackItem from '../../components/TrackItem';
 import {useFocusEffect} from "@react-navigation/native";
 
-const userId = '31eforplcs33bpa476sc4sdnm6ca'; // Example user ID
+const userId = '31vq5afkuv2cchgdpjl7x6mfwfi4'; // Example user ID
 
 export default function Search() {
     const [query, setQuery] = useState('');
