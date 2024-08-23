@@ -54,6 +54,19 @@
 			<artifactId>kotlin-test-junit5</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- Core Spring Security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
 
 		<!-- Testing -->
 		<dependency>
