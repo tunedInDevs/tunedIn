@@ -11,14 +11,12 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
 
     @GetMapping("/login")
     fun login(): ResponseEntity<String> {
-        println("logging in")
         val authUrl = spotifyApiService.getAuthorizationUrl()
         return ResponseEntity.ok(authUrl)
     }
 
     @GetMapping("/callback")
     fun handleCallback(@RequestParam code: String): ResponseEntity<String> {
-        println("Callback")
         return try {
             val token = spotifyApiService.handleAuthorizationCode(code)
             ResponseEntity.ok(token)
