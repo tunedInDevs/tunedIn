@@ -9,29 +9,27 @@ const userId = '31eforplcs33bpa476sc4sdnm6ca';
 export default function MyList() {
     const [ratedTracks, setRatedTracks] = useState<any[]>([]);
 
-    // Function to fetch the user's rated track IDs and then fetch full track details
     const fetchRatedTracks = async () => {
         try {
             const response = await axios.get(`http://localhost:8080/api/users/${userId}/rated-tracks`);
-            const trackIds = response.data.map((track: { spotifyTrackId: string }) => track.spotifyTrackId);
+            const ratedTracksData = response.data;
 
-            // Fetch full track details for each trackId
-            const trackDetailsPromises = trackIds.map((trackId: string) =>
-                axios.get(`http://localhost:8080/api/spotify/track/${trackId}`, {
+            const trackDetailsPromises = ratedTracksData.map((track: { spotifyTrackId: string, rating: number }) =>
+                axios.get(`http://localhost:8080/api/spotify/track/${track.spotifyTrackId}`, {
                     params: { userId }
-                })
+                }).then(response => ({
+                    ...response.data,
+                    rating: track.rating  // Add the rating to the track details
+                }))
             );
 
-            const trackDetailsResponses = await Promise.all(trackDetailsPromises);
-            const fullTrackDetails = trackDetailsResponses.map(response => response.data);
-
+            const fullTrackDetails = await Promise.all(trackDetailsPromises);
             setRatedTracks(fullTrackDetails);
         } catch (error) {
             console.error('Error fetching rated tracks:', error);
         }
     };
 
-    // Use `useFocusEffect` to re-fetch the list when the screen comes into focus
     useFocusEffect(
         useCallback(() => {
             fetchRatedTracks();
@@ -43,7 +41,6 @@ export default function MyList() {
             await axios.delete(`http://localhost:8080/api/users/${userId}/rated-tracks/${trackId}`);
             console.log(`Deleted track with ID: ${trackId}`);
 
-            // Update the ratedTracks state to remove the deleted track
             setRatedTracks((prevTracks) => prevTracks.filter(track => track.id !== trackId));
         } catch (error) {
             console.error('Error deleting track:', error);
@@ -63,7 +60,8 @@ export default function MyList() {
                         artist={item.artists[0].name}
                         albumCover={item.album.images[0].url}
                         duration={item.duration_ms}
-                        onDeleteTrack={handleDeleteTrack}  // Pass the delete handler
+                        rating={item.rating}  // Pass the rating to the component
+                        onDeleteTrack={handleDeleteTrack}
                     />
                 )}
                 ListEmptyComponent={<Text>Your list is empty</Text>}

@@ -8,10 +8,11 @@ interface TrackItemWithDeleteProps {
     artist: string;
     albumCover: string;
     duration: number;  // duration in milliseconds
+    rating: number;  // rating of the track
     onDeleteTrack: (trackId: string) => void;
 }
 
-const TrackItemWithDelete: React.FC<TrackItemWithDeleteProps> = ({ id, title, artist, albumCover, duration, onDeleteTrack }) => {
+const TrackItemWithDelete: React.FC<TrackItemWithDeleteProps> = ({ id, title, artist, albumCover, duration, rating, onDeleteTrack }) => {
     // Convert duration from milliseconds to mm:ss
     const minutes = Math.floor(duration / 60000);
     const seconds = ((duration % 60000) / 1000).toFixed(0);
@@ -31,6 +32,8 @@ const TrackItemWithDelete: React.FC<TrackItemWithDeleteProps> = ({ id, title, ar
                 <Text style={styles.duration}>
                     {minutes}:{seconds < 10 ? '0' : ''}{seconds}
                 </Text>
+                <View style={styles.divider} />
+                <Text style={styles.rating}>{rating}</Text>
                 <View style={styles.divider} />
                 <TouchableOpacity style={styles.button} onPress={handleDeleteClick}>
                     <MaterialIcons name="delete" size={24} color="#fff" />
@@ -77,6 +80,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#FF6347',  // Tomato color for delete button
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    rating: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#1DB954',
     },
     title: {
         fontSize: 16,

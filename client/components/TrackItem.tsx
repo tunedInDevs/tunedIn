@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import InitialRankingModal from './InitialRankingModal';
 
 interface TrackItemProps {
     id: string;
@@ -9,13 +10,27 @@ interface TrackItemProps {
     albumCover: string;
     duration: number;  // duration in milliseconds
     isAdded: boolean;
-    onAddTrack: (trackId: string) => void;
+    onAddTrack: (trackId: string, rating: number) => void;
 }
 
 const TrackItem: React.FC<TrackItemProps> = ({ id, title, artist, albumCover, duration, isAdded, onAddTrack }) => {
-    // Convert duration from milliseconds to mm:ss
+    const [modalVisible, setModalVisible] = useState(false);
+
     const minutes = Math.floor(duration / 60000);
     const seconds = ((duration % 60000) / 1000).toFixed(0);
+
+    const handleOpenModal = () => {
+        setModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setModalVisible(false);
+    };
+
+    const handleAddTrack = (rating: number) => {
+        onAddTrack(id, rating);
+        handleCloseModal();
+    };
 
     return (
         <View style={styles.container}>
@@ -32,9 +47,16 @@ const TrackItem: React.FC<TrackItemProps> = ({ id, title, artist, albumCover, du
                 {isAdded ? (
                     <MaterialIcons name="check" size={24} color="#1DB954" />
                 ) : (
-                    <TouchableOpacity style={styles.button} onPress={() => onAddTrack(id)}>
-                        <MaterialIcons name="add" size={24} color="#fff" />
-                    </TouchableOpacity>
+                    <>
+                        <TouchableOpacity style={styles.button} onPress={handleOpenModal}>
+                            <MaterialIcons name="add" size={24} color="#fff" />
+                        </TouchableOpacity>
+                        <InitialRankingModal
+                            visible={modalVisible}
+                            onClose={handleCloseModal}
+                            onAddTrack={handleAddTrack}
+                        />
+                    </>
                 )}
             </View>
         </View>
