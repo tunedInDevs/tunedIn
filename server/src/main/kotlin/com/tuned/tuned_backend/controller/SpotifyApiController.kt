@@ -18,8 +18,8 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
     @GetMapping("/callback")
     fun handleCallback(@RequestParam code: String): ResponseEntity<String> {
         return try {
-            val token = spotifyApiService.handleAuthorizationCode(code)
-            ResponseEntity.ok(token)
+            spotifyApiService.handleAuthorizationCode(code)
+            return ResponseEntity.ok("User Authentication Successful")
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication failed: ${e.message}")
         }
