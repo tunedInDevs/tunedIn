@@ -1,12 +1,11 @@
 package com.tuned.tuned_backend.service
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.tuned.tuned_backend.model.SpotifyToken
+import com.tuned.tuned_backend.model.SpotifyUserResponse
 import com.tuned.tuned_backend.model.TokenResponse
 import com.tuned.tuned_backend.model.User
 import com.tuned.tuned_backend.repository.SpotifyTokenRepository
@@ -46,12 +45,13 @@ class SpotifyApiService @Autowired constructor(
                 "&scope=user-read-private%20user-read-email%20user-top-read"
     }
 
-    fun handleAuthorizationCode(code: String): String {
+    fun handleAuthorizationCode(code: String): SpotifyUserResponse {
         val tokenResponse = exchangeCodeForTokens(code)
-        val spotifyUserId = getSpotifyUserId(tokenResponse.accessToken)
-        saveOrUpdateSpotifyToken(spotifyUserId, tokenResponse)
-        saveOrUpdateUser(spotifyUserId)
-        return tokenResponse.accessToken
+        println(tokenResponse.accessToken)
+        val spotifyUser = getSpotifyProfileFromAccessToken(tokenResponse.accessToken)
+        saveOrUpdateSpotifyToken(spotifyUser.id, tokenResponse)
+        saveOrUpdateUser(spotifyUser.id)
+        return spotifyUser
     }
 
     fun refreshToken(userId: String) {
@@ -121,19 +121,31 @@ class SpotifyApiService @Autowired constructor(
 
     private fun saveOrUpdateUser(userId: String) {
         if (!userRepository.existsById(userId)) {
-            val newUser = User(id = userId, username = "Spotify User") // TODO: You might want to fetch the actual username from Spotify API
+            val newUser = User(id = userId, username = userId)
             userRepository.save(newUser)
         }
     }
 
-    private fun getSpotifyUserId(accessToken: String): String {
+     private fun getSpotifyProfileFromAccessToken(accessToken: String): SpotifyUserResponse {
         val url = "$spotifyApiBaseUrl/me"
         val headers = HttpHeaders().apply {
             setBearerAuth(accessToken)
         }
         val request = HttpEntity<String>(headers)
         val response = restTemplate.exchange(url, HttpMethod.GET, request, SpotifyUserResponse::class.java)
-        return response.body?.id ?: throw RuntimeException("Failed to get Spotify user ID")
+        return response.body ?: throw RuntimeException("Failed to get Spotify user")
+    }
+
+    fun getSpotifyProfileFromUserId(userId: String): SpotifyUserResponse {
+        val token = spotifyTokenRepository.findByUserId(userId)
+            ?: throw RuntimeException("No token found for user $userId")
+        val url = "$spotifyApiBaseUrl/me"
+        val headers = HttpHeaders().apply {
+            setBearerAuth(token.accessToken)
+        }
+        val request = HttpEntity<String>(headers)
+        val response = restTemplate.exchange(url, HttpMethod.GET, request, SpotifyUserResponse::class.java)
+        return response.body ?: throw RuntimeException("Failed to get Spotify user")
     }
 
     fun searchTracks(
@@ -208,9 +220,3 @@ class SpotifyApiService @Autowired constructor(
         }
     }
 }
-
-data class SpotifyUserResponse(
-    @JsonProperty("id") val id: String,
-    @JsonProperty("display_name") val displayName: String?,
-    @JsonProperty("email") val email: String?
-)

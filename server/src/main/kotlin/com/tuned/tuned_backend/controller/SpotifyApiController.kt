@@ -1,5 +1,6 @@
 package com.tuned.tuned_backend.controller
 
+import com.tuned.tuned_backend.model.SpotifyUserResponse
 import com.tuned.tuned_backend.service.SpotifyApiService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,12 +17,12 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
     }
 
     @GetMapping("/callback")
-    fun handleCallback(@RequestParam code: String): ResponseEntity<String> {
+    fun handleCallback(@RequestParam code: String): ResponseEntity<SpotifyUserResponse?> {
         return try {
-            spotifyApiService.handleAuthorizationCode(code)
-            return ResponseEntity.ok("User Authentication Successful")
+            val spotifyProfile = spotifyApiService.handleAuthorizationCode(code)
+            return ResponseEntity.ok(spotifyProfile)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication failed: ${e.message}")
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
         }
     }
 
@@ -32,6 +33,16 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
             ResponseEntity.ok("Token refreshed successfully")
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token refresh failed: ${e.message}")
+        }
+    }
+
+    @GetMapping("/profile")
+    fun getUserProfileFromAccessCode(@RequestParam userId: String): ResponseEntity<SpotifyUserResponse?> {
+        return try {
+            val profile = spotifyApiService.getSpotifyProfileFromUserId(userId)
+            ResponseEntity.ok(profile)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
         }
     }
 
