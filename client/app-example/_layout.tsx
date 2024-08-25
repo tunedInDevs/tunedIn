@@ -4,15 +4,15 @@ export default function RootLayout() {
     return (
         <Stack>
             <Stack.Screen
-                name="Login"
+                name="login"
                 options={{ headerShown: false }} // Hides the header on the login screen
             />
             <Stack.Screen
-                name="Home"
+                name="home"
                 options={{ headerShown: false }} // Hides the header on the home screen
             />
             <Stack.Screen
-                name="Callback"
+                name="callback"
                 options={{ headerShown: false }} // Hides the header on the callback screen
             />
         </Stack>

@@ -1,11 +1,10 @@
 import React from 'react';
 import {Text, View} from "react-native";
 
-export default function Search() {
+export default function List() {
     return (
         <View>
-            <Text>Search Screen</Text>
+            <Text>List Screen</Text>
         </View>
     );
 }
-

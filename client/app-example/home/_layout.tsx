@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Search from './Search';
-import List from './List';
+import Search from './search';
+import MyList from './my-list';
 
 const Tab = createBottomTabNavigator();
 
@@ -10,12 +10,13 @@ export default function HomeLayout() {
             <Tab.Screen
                 name="Search"
                 component={Search}
-                options={{ headerShown: false }}
+                options={{ headerTitle: 'Search' }}
             />
             <Tab.Screen
-                name="My List"
-                component={List}
-                options={{ headerShown: false }}            />
+                name="MyList"
+                component={MyList}
+                options={{ headerTitle: 'My List' }}
+            />
         </Tab.Navigator>
     );
 }
