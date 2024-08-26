@@ -12,7 +12,7 @@ export default function RootLayout() {
                 options={{ headerShown: false }} // Hides the header on the home screen
             />
             <Stack.Screen
-                name="Callback"
+                name="callback"
                 options={{ headerShown: false }} // Hides the header on the callback screen
             />
         </Stack>
