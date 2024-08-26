@@ -125,6 +125,7 @@ class SpotifyApiService @Autowired constructor(
     fun searchTracks(
         userId: String,
         query: String,
+        type: String?,
         market: String?,
         limit: Int?,
         offset: Int?,
@@ -135,8 +136,8 @@ class SpotifyApiService @Autowired constructor(
 
         val url = UriComponentsBuilder.fromHttpUrl("$spotifyApiBaseUrl/search")
             .queryParam("q", query)
-            .queryParam("type", "track")
             .apply {
+                type?.let { queryParam("type", it) }
                 market?.let { queryParam("market", it) }
                 limit?.let { queryParam("limit", it) }
                 offset?.let { queryParam("offset", it) }
