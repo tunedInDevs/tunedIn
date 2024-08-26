@@ -27,9 +27,9 @@ class JwtService {
         }
     }
 
-    fun validateTokenAndGetUserId(token: String): String = try {
+    fun validateTokenAndGetUserId(token: String): String? = try {
         Jwts.parserBuilder().setSigningKey(JwtConstants.key).build().parseClaimsJws(token).body.subject
     } catch (e: Exception) {
-        "Invalid Token"
+        null
     }
 }
