@@ -1,35 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, ActivityIndicator } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { handleSpotifyCallback } from '@/scripts/auth/callback';
 
 export default function Callback() {
-    const [code, setCode] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const navigation = useNavigation();
+    const route = useRoute();
+
+    // Extract the `code` parameter from the navigation route's params
+    const code = route.params?.code || null;
 
     useEffect(() => {
-        // Get the current URL
-        const url = window.location.href;
-
-        // Parse the URL and get the 'code' parameter
-        const urlParams = new URLSearchParams(new URL(url).search);
-        const codeParam = urlParams.get('code');
-
-        if (codeParam) {
-            setCode(codeParam);
-            console.log('Received code:', codeParam);
+        if (code) {
+            authenticateWithSpotify(code);
         } else {
             console.log('No code received');
+            setLoading(false);
         }
+    }, [code]);
 
-        // You can navigate to the Home screen after processing the code
-        // navigation.navigate('(Home)');
-    }, []);
+    const authenticateWithSpotify = async (code: string) => {
+        try {
+            const loginResponse = await handleSpotifyCallback(code);
+
+            // Store the token securely
+            await SecureStore.setItemAsync('spotify_jwt', loginResponse.token);
+
+            console.log('Token stored successfully:', loginResponse.token);
+
+            // Navigate to Home screen after successful authentication
+            navigation.navigate('(Home)');
+        } catch (error) {
+            console.error('Authentication failed:', error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Callback Screen</Text>
-            {code ? (
-                <Text style={styles.codeText}>Code: {code}</Text>
+            {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
             ) : (
-                <Text style={styles.codeText}>No code received</Text>
+                <Text style={styles.text}>
+                    {code ? `Code: ${code}` : 'No code received'}
+                </Text>
             )}
         </View>
     );
@@ -45,9 +62,5 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 20,
         marginBottom: 10,
-    },
-    codeText: {
-        fontSize: 16,
-        color: 'blue',
     },
 });
