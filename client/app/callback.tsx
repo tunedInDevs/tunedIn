@@ -1,57 +1,53 @@
 import React, { useEffect, useState } from 'react';
-import { View, Linking, ActivityIndicator } from 'react-native';
-import axios from 'axios';
+import { Text, View, StyleSheet } from 'react-native';
 
-interface LinkingEvent {
-    url: string;
-}
-
-const SpotifyAuthCallback: React.FC = () => {
+export default function Callback() {
+    const [code, setCode] = useState<string | null>(null);
 
     useEffect(() => {
-        const handleDeepLink = async (event: LinkingEvent) => {
-            const { url } = event;
-            if (url.includes('localhost:8081/callback')) {
-                const code = url.split('code=')[1];
-                if (code) {
-                    try {
-                        const response = await axios.get<string>(`http://localhost:8080/api/spotify/callback?code=${code}`);
-                        window.location.href = "http://localhost:8081/home";
-                        console.log("Authentication Sucessful: ", response.data)
-                    } catch (error) {
-                        if (axios.isAxiosError(error)) {
-                            console.log('Authentication failed: ' + error.message);
-                        } else {
-                            console.log('An unexpected error occurred');
-                        }
-                    }
-                } else {
-                    console.log('No authorization code found in the URL');
-                }
-            }
-        };
+        // Get the current URL
+        const url = window.location.href;
 
-        // Add event listener for deep linking
-        const subscription = Linking.addEventListener('url', handleDeepLink);
+        // Parse the URL and get the 'code' parameter
+        const urlParams = new URLSearchParams(new URL(url).search);
+        const codeParam = urlParams.get('code');
 
-        // Check if the app was opened with a deep link
-        Linking.getInitialURL().then((url: string | null) => {
-            if (url) {
-                handleDeepLink({ url });
-            }
-        });
+        if (codeParam) {
+            setCode(codeParam);
+            console.log('Received code:', codeParam);
+        } else {
+            console.log('No code received');
+        }
 
-        // Clean up the event listener
-        return () => {
-            subscription.remove();
-        };
+        // You can navigate to the Home screen after processing the code
+        // navigation.navigate('(Home)');
     }, []);
 
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color="#0000ff" />
+        <View style={styles.container}>
+            <Text style={styles.text}>Callback Screen</Text>
+            {code ? (
+                <Text style={styles.codeText}>Code: {code}</Text>
+            ) : (
+                <Text style={styles.codeText}>No code received</Text>
+            )}
         </View>
     );
-};
+}
 
-export default SpotifyAuthCallback;
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+    },
+    text: {
+        fontSize: 20,
+        marginBottom: 10,
+    },
+    codeText: {
+        fontSize: 16,
+        color: 'blue',
+    },
+});
