@@ -1,6 +1,8 @@
 package com.tuned.tuned_backend.controller
 
+import com.tuned.tuned_backend.model.LoginResponse
 import com.tuned.tuned_backend.model.SpotifyUserResponse
+import com.tuned.tuned_backend.service.JwtService
 import com.tuned.tuned_backend.service.SpotifyApiService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -8,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/spotify")
-class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
+class SpotifyApiController(private val spotifyApiService: SpotifyApiService, private val jwtService: JwtService) {
 
     @GetMapping("/login")
     fun login(): ResponseEntity<String> {
@@ -17,10 +19,11 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
     }
 
     @GetMapping("/callback")
-    fun handleCallback(@RequestParam code: String): ResponseEntity<SpotifyUserResponse?> {
+    fun handleCallback(@RequestParam code: String): ResponseEntity<LoginResponse?> {
         return try {
             val spotifyProfile = spotifyApiService.handleAuthorizationCode(code)
-            return ResponseEntity.ok(spotifyProfile)
+            val jwt = jwtService.generateToken(spotifyProfile.id)
+            return ResponseEntity.ok(LoginResponse(jwt, spotifyProfile))
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
         }
