@@ -8,7 +8,7 @@ export default function RootLayout() {
                 options={{ headerShown: false }} // Hides the header on the login screen
             />
             <Stack.Screen
-                name="Home"
+                name="(Home)"
                 options={{ headerShown: false }} // Hides the header on the home screen
             />
             <Stack.Screen
