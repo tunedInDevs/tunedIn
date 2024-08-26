@@ -10,15 +10,11 @@ data class RatedTrack(
     val id: Long? = null,
 
     @Column(name = "user_id")
-    val userId: String,
+    val userId: String = "",
 
     @Column(name = "spotify_track_id")
-    val spotifyTrackId: String,
+    val spotifyTrackId: String = "",
 
     @Column(name = "rating")
-    var rating: Int? = null
-) {
-    constructor() : this(0, "", "", 0) {
-
-    }
-}
+    var rating: Double = 0.0
+)
