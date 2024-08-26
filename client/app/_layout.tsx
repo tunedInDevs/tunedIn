@@ -2,9 +2,9 @@ import { Stack } from 'expo-router';
 
 export default function RootLayout() {
     return (
-        <Stack>
+        <Stack initialRouteName="Index">
             <Stack.Screen
-                name="Login"
+                name="index"
                 options={{ headerShown: false }} // Hides the header on the login screen
             />
             <Stack.Screen
