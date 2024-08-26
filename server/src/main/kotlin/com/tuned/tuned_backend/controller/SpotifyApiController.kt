@@ -1,7 +1,8 @@
 package com.tuned.tuned_backend.controller
 
-import com.tuned.tuned_backend.model.SpotifyTrackResponse
-import com.tuned.tuned_backend.model.SpotifyUserResponse
+import com.tuned.tuned_backend.model.spotifyapi.SpotifySearchResponse
+import com.tuned.tuned_backend.model.spotifyapi.SpotifyTrackResponse
+import com.tuned.tuned_backend.model.spotifyapi.SpotifyUserResponse
 import com.tuned.tuned_backend.service.SpotifyApiService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -47,8 +48,13 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
         @Parameter(description = "Limit of results") @RequestParam(required = false) limit: Int?,
         @Parameter(description = "Offset for pagination") @RequestParam(required = false) offset: Int?,
         @Parameter(description = "Include external content") @RequestParam(required = false) includeExternal: String?
-    ): ResponseEntity<String> {
-        return spotifyApiService.searchTracks(userId, query, market, limit, offset, includeExternal)
+    ): ResponseEntity<SpotifySearchResponse> {
+        return try {
+            val searchResult = spotifyApiService.searchTracks(userId, query, market, limit, offset, includeExternal)
+            ResponseEntity.ok(searchResult)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
+        }
     }
 
     @Operation(summary = "Get track details", description = "Retrieves details of a specific track from Spotify")
