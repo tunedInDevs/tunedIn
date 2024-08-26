@@ -6,10 +6,6 @@ import jakarta.persistence.*
 @Table(name = "users")
 data class User(
     @Id
-    val id: String,
-    val username: String
-){
-    constructor() : this("", "") {
-
-    }
-}
+    val id: String = "",
+    val username: String = "",
+)

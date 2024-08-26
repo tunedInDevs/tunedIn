@@ -1,6 +1,8 @@
 package com.tuned.tuned_backend.controller
 
 import com.tuned.tuned_backend.model.RatedTrack
+import com.tuned.tuned_backend.model.SpotifyTrackResponse
+import com.tuned.tuned_backend.model.UserRatedTrackResponse
 import com.tuned.tuned_backend.service.TrackRatingService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -26,10 +28,11 @@ class UserRatedTracksController(private val trackRatingService: TrackRatingServi
     @PostMapping("/rated-tracks")
     fun addRatedTrack(
         @Parameter(hidden = true) @AuthenticationPrincipal userId: String,
-        @Parameter(description = "Spotify Track ID", required = true) @RequestParam spotifyTrackId: String
+        @Parameter(description = "Spotify Track ID", required = true) @RequestParam spotifyTrackId: String,
+        @Parameter(description = "The initial rating for this track") @RequestParam rating: Double
     ): ResponseEntity<String> {
         return try {
-            trackRatingService.addTrackToUserRatedList(userId, spotifyTrackId)
+            trackRatingService.addTrackToUserRatedList(userId, spotifyTrackId, rating)
             ResponseEntity.status(HttpStatus.CREATED).body("Track added to rated list successfully")
         } catch (e: RuntimeException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
@@ -43,7 +46,7 @@ class UserRatedTracksController(private val trackRatingService: TrackRatingServi
         content = [Content(mediaType = "application/json", schema = Schema(implementation = RatedTrack::class))]
     )
     @GetMapping("/rated-tracks")
-    fun getUserRatedTracks(@Parameter(hidden = true) @AuthenticationPrincipal userId: String): ResponseEntity<List<RatedTrack>> {
+    fun getUserRatedTracks(@Parameter(hidden = true) @AuthenticationPrincipal userId: String): ResponseEntity<List<UserRatedTrackResponse>> {
         val ratedTracks = trackRatingService.getUserRatedTracks(userId)
         return ResponseEntity.ok(ratedTracks)
     }
@@ -71,7 +74,7 @@ class UserRatedTracksController(private val trackRatingService: TrackRatingServi
     fun updateTrackRating(
         @Parameter(hidden = true) @AuthenticationPrincipal userId: String,
         @Parameter(description = "Spotify Track ID", required = true) @PathVariable spotifyTrackId: String,
-        @Parameter(description = "New rating value", required = true) @RequestParam rating: Int
+        @Parameter(description = "New rating value", required = true) @RequestParam rating: Double
     ): ResponseEntity<String> {
         return try {
             trackRatingService.updateTrackRating(userId, spotifyTrackId, rating)

@@ -1,8 +1,7 @@
 package com.tuned.tuned_backend.controller
 
-import com.tuned.tuned_backend.model.LoginResponse
+import com.tuned.tuned_backend.model.SpotifyTrackResponse
 import com.tuned.tuned_backend.model.SpotifyUserResponse
-import com.tuned.tuned_backend.service.JwtService
 import com.tuned.tuned_backend.service.SpotifyApiService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -21,19 +20,6 @@ import org.springframework.web.bind.annotation.*
 @SecurityRequirement(name = "bearer-jwt")
 @Tag(name = "Spotify API", description = "Endpoints for interacting with Spotify API")
 class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
-
-    @Operation(summary = "Refresh Spotify token", description = "Refreshes the Spotify access token for the authenticated user")
-    @ApiResponse(responseCode = "200", description = "Token refreshed successfully")
-    @ApiResponse(responseCode = "500", description = "Token refresh failed")
-    @GetMapping("/refresh")
-    fun refreshToken(@Parameter(hidden = true) @AuthenticationPrincipal userId: String): ResponseEntity<String> {
-        return try {
-            spotifyApiService.refreshToken(userId)
-            ResponseEntity.ok("Token refreshed successfully")
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Token refresh failed: ${e.message}")
-        }
-    }
 
     @Operation(summary = "Get user profile", description = "Retrieves the Spotify profile of the authenticated user")
     @ApiResponse(responseCode = "200", description = "User profile retrieved successfully",
@@ -72,12 +58,12 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
     fun getTrack(
         @Parameter(description = "ID of the track") @PathVariable trackId: String,
         @Parameter(hidden = true) @AuthenticationPrincipal userId: String
-    ): ResponseEntity<String> {
+    ): ResponseEntity<SpotifyTrackResponse?> {
         return try {
             val trackInfo = spotifyApiService.getTrack(userId, trackId)
             ResponseEntity.ok(trackInfo)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch track: ${e.message}")
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
         }
     }
 }
