@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
-import org.springframework.web.bind.annotation.*
-import org.springframework.http.ResponseEntity
 import java.util.*
 
 object JwtConstants {
@@ -27,9 +25,9 @@ class JwtService {
         }
     }
 
-    fun validateTokenAndGetUserId(token: String): String = try {
+    fun validateTokenAndGetUserId(token: String): String? = try {
         Jwts.parserBuilder().setSigningKey(JwtConstants.key).build().parseClaimsJws(token).body.subject
     } catch (e: Exception) {
-        "Invalid Token"
+        null
     }
 }
