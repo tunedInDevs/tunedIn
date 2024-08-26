@@ -1,4 +1,4 @@
-package com.tuned.tuned_backend.model
+package com.tuned.tuned_backend.model.spotifyapi
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

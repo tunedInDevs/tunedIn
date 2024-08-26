@@ -1,6 +1,6 @@
 package com.tuned.tuned_backend.repository
 
-import com.tuned.tuned_backend.model.RatedTrack
+import com.tuned.tuned_backend.model.entities.RatedTrack
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface RatedTrackRepository : JpaRepository<RatedTrack, Long> {

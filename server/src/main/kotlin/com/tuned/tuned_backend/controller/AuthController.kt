@@ -1,6 +1,7 @@
 package com.tuned.tuned_backend.controller
 
-import com.tuned.tuned_backend.model.LoginResponse
+import com.tuned.tuned_backend.model.authapi.CallbackResponse
+import com.tuned.tuned_backend.model.authapi.LoginResponse
 import com.tuned.tuned_backend.service.JwtService
 import com.tuned.tuned_backend.service.SpotifyApiService
 import io.swagger.v3.oas.annotations.Operation
@@ -27,12 +28,12 @@ class AuthController(
     @ApiResponse(
         responseCode = "200",
         description = "Successfully retrieved authorization URL",
-        content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]
+        content = [Content(mediaType = "text/plain", schema = Schema(implementation = LoginResponse::class))]
     )
     @GetMapping("/login")
-    fun login(): ResponseEntity<String> {
-        val authUrl = spotifyApiService.getAuthorizationUrl()
-        return ResponseEntity.ok(authUrl)
+    fun login(): ResponseEntity<LoginResponse> {
+        val loginResponse = spotifyApiService.getAuthorizationUrl()
+        return ResponseEntity.ok(loginResponse)
     }
 
     @Operation(
@@ -42,7 +43,7 @@ class AuthController(
     @ApiResponse(
         responseCode = "200",
         description = "Successfully authenticated and generated JWT",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = LoginResponse::class))]
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = CallbackResponse::class))]
     )
     @ApiResponse(
         responseCode = "500",
@@ -52,11 +53,11 @@ class AuthController(
     fun handleCallback(
         @Parameter(description = "Authorization code returned by Spotify", required = true)
         @RequestParam code: String
-    ): ResponseEntity<LoginResponse?> {
+    ): ResponseEntity<CallbackResponse?> {
         return try {
             val spotifyProfile = spotifyApiService.handleCallback(code)
             val jwt = jwtService.generateToken(spotifyProfile.id)
-            ResponseEntity.ok(LoginResponse(jwt, spotifyProfile))
+            ResponseEntity.ok(CallbackResponse(jwt, spotifyProfile))
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
         }

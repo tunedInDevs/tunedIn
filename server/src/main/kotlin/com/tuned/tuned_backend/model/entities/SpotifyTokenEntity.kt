@@ -1,4 +1,4 @@
-package com.tuned.tuned_backend.model
+package com.tuned.tuned_backend.model.entities
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -7,7 +7,7 @@ import jakarta.persistence.Id
 import java.time.Instant
 
 @Entity
-data class SpotifyToken(
+data class SpotifyTokenEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val userId: String,

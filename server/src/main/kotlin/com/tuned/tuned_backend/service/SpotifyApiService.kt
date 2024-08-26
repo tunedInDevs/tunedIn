@@ -1,6 +1,12 @@
 package com.tuned.tuned_backend.service
 
 import com.tuned.tuned_backend.model.*
+import com.tuned.tuned_backend.model.authapi.LoginResponse
+import com.tuned.tuned_backend.model.entities.SpotifyTokenEntity
+import com.tuned.tuned_backend.model.spotifyapi.SpotifySearchResponse
+import com.tuned.tuned_backend.model.spotifyapi.SpotifyTrackResponse
+import com.tuned.tuned_backend.model.spotifyapi.SpotifyUserResponse
+import com.tuned.tuned_backend.model.spotifyapi.TokenResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -9,7 +15,6 @@ import com.tuned.tuned_backend.repository.SpotifyTokenRepository
 import com.tuned.tuned_backend.repository.UserRepository
 import org.springframework.http.*
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.Instant
 
@@ -34,12 +39,12 @@ class SpotifyApiService @Autowired constructor(
 
     private val spotifyApiBaseUrl = "https://api.spotify.com/v1"
 
-    fun getAuthorizationUrl(): String {
-        return "https://accounts.spotify.com/authorize" +
+    fun getAuthorizationUrl(): LoginResponse {
+        return LoginResponse("https://accounts.spotify.com/authorize" +
                 "?client_id=$clientId" +
                 "&response_type=code" +
                 "&redirect_uri=$redirectUri" +
-                "&scope=user-read-private%20user-read-email%20user-top-read"
+                "&scope=user-read-private%20user-read-email%20user-top-read")
     }
 
     fun handleCallback(code: String): SpotifyUserResponse {
@@ -77,7 +82,7 @@ class SpotifyApiService @Autowired constructor(
                 expiresIn = tokenResponse.expiresIn
                 tokenType = tokenResponse.tokenType
                 updatedAt = Instant.now()
-            } ?: SpotifyToken(
+            } ?: SpotifyTokenEntity(
                 userId = userId,
                 accessToken = tokenResponse.accessToken,
                 refreshToken = tokenResponse.refreshToken,
@@ -120,18 +125,19 @@ class SpotifyApiService @Autowired constructor(
     fun searchTracks(
         userId: String,
         query: String,
+        type: String?,
         market: String?,
         limit: Int?,
         offset: Int?,
         includeExternal: String?
-    ): ResponseEntity<String> {
+    ): SpotifySearchResponse {
         val spotifyToken = spotifyTokenRepository.findByUserId(userId)
             ?: throw RuntimeException("No token found for user $userId")
 
         val url = UriComponentsBuilder.fromHttpUrl("$spotifyApiBaseUrl/search")
             .queryParam("q", query)
-            .queryParam("type", "track")
             .apply {
+                type?.let { queryParam("type", it) }
                 market?.let { queryParam("market", it) }
                 limit?.let { queryParam("limit", it) }
                 offset?.let { queryParam("offset", it) }
@@ -145,17 +151,8 @@ class SpotifyApiService @Autowired constructor(
         }
 
         val request = HttpEntity<String>(headers)
-
-        return try {
-            val response = restTemplate.exchange(url, HttpMethod.GET, request, String::class.java)
-            ResponseEntity.ok(response.body)
-        } catch (e: HttpClientErrorException) {
-            if (e.statusCode == HttpStatus.UNAUTHORIZED) {
-                ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.responseBodyAsString)
-            } else {
-                ResponseEntity.status(e.statusCode).body(e.responseBodyAsString)
-            }
-        }
+        val response = restTemplate.exchange(url, HttpMethod.GET, request, SpotifySearchResponse::class.java)
+        return response.body ?: throw RuntimeException("Failed to get search result")
     }
 
     fun getTrack(userId: String, trackId: String): SpotifyTrackResponse {
@@ -182,7 +179,7 @@ class SpotifyApiService @Autowired constructor(
         }
     }
 
-    fun getSpotifyTokenByUserId(userId: String): SpotifyToken {
+    fun getSpotifyTokenByUserId(userId: String): SpotifyTokenEntity {
         return spotifyTokenRepository.findByUserId(userId)
             ?: throw RuntimeException("No token found for user $userId")
     }
