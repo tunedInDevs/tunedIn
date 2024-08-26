@@ -7,7 +7,7 @@ data class SpotifyUserResponse(
     @JsonProperty("display_name") val displayName: String?,
     @JsonProperty("email") val email: String?,
     @JsonProperty("explicit_content") val explicitContent: ExplicitContent?,
-    @JsonProperty("external_urls") val externalUrls: ExternalUrls,
+    @JsonProperty("external_urls") val externalUrl: ExternalUrl,
     @JsonProperty("followers") val followers: Followers,
     @JsonProperty("href") val href: String,
     @JsonProperty("id") val id: String,
@@ -22,7 +22,7 @@ data class ExplicitContent(
     @JsonProperty("filter_locked") val filterLocked: Boolean
 )
 
-data class ExternalUrls(
+data class ExternalUrl(
     @JsonProperty("spotify") val spotify: String
 )
 

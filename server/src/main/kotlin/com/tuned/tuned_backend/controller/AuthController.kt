@@ -54,7 +54,7 @@ class AuthController(
         @RequestParam code: String
     ): ResponseEntity<LoginResponse?> {
         return try {
-            val spotifyProfile = spotifyApiService.handleAuthorizationCode(code)
+            val spotifyProfile = spotifyApiService.handleCallback(code)
             val jwt = jwtService.generateToken(spotifyProfile.id)
             ResponseEntity.ok(LoginResponse(jwt, spotifyProfile))
         } catch (e: Exception) {
