@@ -1,6 +1,6 @@
 package com.tuned.tuned_backend.controller
 
-import com.tuned.tuned_backend.model.RatedTrack
+import com.tuned.tuned_backend.model.entities.RatedTrack
 import com.tuned.tuned_backend.model.ratingsapi.UserRatedTrackResponse
 import com.tuned.tuned_backend.service.TrackRatingService
 import io.swagger.v3.oas.annotations.Operation

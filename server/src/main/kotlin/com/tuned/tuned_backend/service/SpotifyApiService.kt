@@ -2,6 +2,7 @@ package com.tuned.tuned_backend.service
 
 import com.tuned.tuned_backend.model.*
 import com.tuned.tuned_backend.model.authapi.LoginResponse
+import com.tuned.tuned_backend.model.entities.SpotifyTokenEntity
 import com.tuned.tuned_backend.model.spotifyapi.SpotifySearchResponse
 import com.tuned.tuned_backend.model.spotifyapi.SpotifyTrackResponse
 import com.tuned.tuned_backend.model.spotifyapi.SpotifyUserResponse
@@ -14,7 +15,6 @@ import com.tuned.tuned_backend.repository.SpotifyTokenRepository
 import com.tuned.tuned_backend.repository.UserRepository
 import org.springframework.http.*
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.Instant
 

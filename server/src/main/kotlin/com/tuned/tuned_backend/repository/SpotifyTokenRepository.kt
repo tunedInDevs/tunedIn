@@ -1,6 +1,6 @@
 package com.tuned.tuned_backend.repository
 
-import com.tuned.tuned_backend.model.SpotifyTokenEntity
+import com.tuned.tuned_backend.model.entities.SpotifyTokenEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

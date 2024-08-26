@@ -1,5 +1,5 @@
 # How to Start Server
-```mvn clean && mvn spring-boot:run```
+```docker-compose up --build```
 
 This will open the server on http://localhost:8080
 

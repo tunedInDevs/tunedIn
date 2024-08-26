@@ -1,4 +1,4 @@
-package com.tuned.tuned_backend.model
+package com.tuned.tuned_backend.model.entities
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
