@@ -20,15 +20,3 @@ services:
       - SPOTIFY_API_BASE_URL=${SPOTIFY_API_BASE_URL}
     volumes:
       - ./data:/app/data
-    depends_on:
-      - redis
-
-  redis:
-    image: redis:6.2-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-
-volumes:
-  redis_data:
