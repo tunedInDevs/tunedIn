@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { API_BASE_URL } from '@env'; // Import the base URL from the environment variable
 
 interface SpotifyProfile {
     id: string;
@@ -12,7 +13,7 @@ interface LoginResponse {
 
 export const handleSpotifyCallback = async (code: string): Promise<LoginResponse> => {
     try {
-        const response: AxiosResponse<LoginResponse> = await axios.get('/api/auth/callback', {
+        const response: AxiosResponse<LoginResponse> = await axios.get(`${API_BASE_URL}/api/auth/callback`, {
             params: { code },
         });
         return response.data;
@@ -20,3 +21,4 @@ export const handleSpotifyCallback = async (code: string): Promise<LoginResponse
         throw new Error(`Failed to authenticate with Spotify: ${error.response?.data || error.message}`);
     }
 };
+

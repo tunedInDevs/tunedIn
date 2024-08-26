@@ -1,7 +1,9 @@
 import React from 'react';
 import { Text, View, SafeAreaView, StyleSheet } from 'react-native';
+import { getStoredToken} from "@/scripts/auth/getStoredToken";
 
 export default function Search() {
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>

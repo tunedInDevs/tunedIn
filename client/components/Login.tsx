@@ -23,11 +23,8 @@ export default function Login() {
             setLoading(false);
         }
     };
-    console.log("authUrl: ", authUrl)
     const handleCloseModal = () => {
         setModalVisible(false);
-        // You can navigate to (Home) after the modal is closed if needed
-        // navigation.navigate("(Home)");
     };
 
     return (
