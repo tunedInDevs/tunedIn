@@ -1,6 +1,6 @@
 package com.tuned.tuned_backend.service
 
-import com.tuned.tuned_backend.model.RatedTrack
+import com.tuned.tuned_backend.model.entities.RatedTrack
 import com.tuned.tuned_backend.model.ratingsapi.UserRatedTrackResponse
 import com.tuned.tuned_backend.repository.RatedTrackRepository
 import com.tuned.tuned_backend.repository.UserRepository
@@ -38,7 +38,7 @@ class TrackRatingService(
     }
 
     @Transactional
-    fun removeTrackFromUserRatedList(userId: String, spotifyTrackId: String): RatedTrack{
+    fun removeTrackFromUserRatedList(userId: String, spotifyTrackId: String): RatedTrack {
         val ratedTrack = ratedTrackRepository.findByUserIdAndSpotifyTrackId(userId, spotifyTrackId) ?: throw RuntimeException("Could not find track in user list")
         ratedTrackRepository.deleteByUserIdAndSpotifyTrackId(userId, spotifyTrackId)
         return ratedTrack

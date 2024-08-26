@@ -28,7 +28,7 @@ class AuthController(
     @ApiResponse(
         responseCode = "200",
         description = "Successfully retrieved authorization URL",
-        content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]
+        content = [Content(mediaType = "text/plain", schema = Schema(implementation = LoginResponse::class))]
     )
     @GetMapping("/login")
     fun login(): ResponseEntity<LoginResponse> {
