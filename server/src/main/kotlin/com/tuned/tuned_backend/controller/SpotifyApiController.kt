@@ -1,5 +1,6 @@
 package com.tuned.tuned_backend.controller
 
+import com.tuned.tuned_backend.model.LoginResponse
 import com.tuned.tuned_backend.model.SpotifyUserResponse
 import com.tuned.tuned_backend.service.JwtService
 import com.tuned.tuned_backend.service.SpotifyApiService
