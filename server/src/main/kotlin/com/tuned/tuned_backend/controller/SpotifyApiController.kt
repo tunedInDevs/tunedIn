@@ -44,13 +44,14 @@ class SpotifyApiController(private val spotifyApiService: SpotifyApiService) {
     fun searchTracks(
         @Parameter(hidden = true) @AuthenticationPrincipal userId: String,
         @Parameter(description = "Search query") @RequestParam query: String,
+        @Parameter(description = "Search type [track, album, artist, ...]") @RequestParam type: String,
         @Parameter(description = "Market code") @RequestParam(required = false) market: String?,
         @Parameter(description = "Limit of results") @RequestParam(required = false) limit: Int?,
         @Parameter(description = "Offset for pagination") @RequestParam(required = false) offset: Int?,
         @Parameter(description = "Include external content") @RequestParam(required = false) includeExternal: String?
     ): ResponseEntity<SpotifySearchResponse> {
         return try {
-            val searchResult = spotifyApiService.searchTracks(userId, query, market, limit, offset, includeExternal)
+            val searchResult = spotifyApiService.searchTracks(userId, query, type, market, limit, offset, includeExternal)
             ResponseEntity.ok(searchResult)
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
