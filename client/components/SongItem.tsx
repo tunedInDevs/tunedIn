@@ -16,12 +16,16 @@ const SongItem: React.FC<SongItemProps> = ({ title, artist, albumCover, duration
         <View style={styles.container}>
             <Image source={{ uri: albumCover }} style={styles.albumCover} />
             <View style={styles.info}>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.artist}>{artist}</Text>
+                <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+                    {title}
+                </Text>
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                    {artist}
+                </Text>
             </View>
-            {/*<Text style={styles.duration}>*/}
-            {/*    {minutes}:{seconds < 10 ? '0' : ''}{seconds}*/}
-            {/*</Text>*/}
+            <Text style={styles.duration}>
+                {minutes}:{seconds < 10 ? '0' : ''}{seconds}
+            </Text>
         </View>
     );
 };
@@ -43,11 +47,11 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     title: {
-        fontSize: 16,
+        fontSize: 14, // Slightly reduced font size
         fontWeight: 'bold',
     },
     artist: {
-        fontSize: 14,
+        fontSize: 12, // Slightly reduced font size
         color: '#666',
     },
     duration: {

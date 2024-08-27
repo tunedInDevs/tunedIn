@@ -22,13 +22,16 @@ const ListItem: React.FC<ListItemProps> = ({ song, handleDeleteItem }) => {
 
     return (
         <View style={styles.container}>
-            <SongItem
-                title={track.name}
-                artist={track.artists.map(artist => artist.name).join(', ')}
-                albumCover={track.album.images[0]?.url || ''}
-                duration={track.duration_ms}
-            />
+            <View style={styles.songItemContainer}>
+                <SongItem
+                    title={track.name}
+                    artist={track.artists.map(artist => artist.name).join(', ')}
+                    albumCover={track.album.images[0]?.url || ''}
+                    duration={track.duration_ms}
+                />
+            </View>
             <View style={styles.actionsContainer}>
+                <View style={styles.divider} />
                 <Text style={styles.rating}>{rating.toFixed(1)}</Text>
                 <View style={styles.divider} />
                 <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteItem(track.id)}>
@@ -48,11 +51,14 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
     },
+    songItemContainer: {
+        flex: 0.7,  // Allocates 70% of the space to the SongItem
+    },
     actionsContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-end',  // Align actions (rating, delete button) to the right
-        flex: 0.3, // Adjust this to control the space allocation
+        justifyContent: 'flex-end',
+        flex: 0.3,  // Allocates 30% of the space to rating and delete button
     },
     rating: {
         fontSize: 16,

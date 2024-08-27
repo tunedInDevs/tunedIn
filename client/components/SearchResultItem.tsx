@@ -11,10 +11,11 @@ interface SearchResultItemProps {
         album: { images: Array<{ url: string }> };
         duration_ms: number;
     };
+    isAdded: boolean;
     onAddToList: (songId: string) => void;
 }
 
-const SearchResultItem: React.FC<SearchResultItemProps> = ({ song, onAddToList }) => {
+const SearchResultItem: React.FC<SearchResultItemProps> = ({ song, isAdded, onAddToList }) => {
     return (
         <View style={styles.container}>
             <View style={styles.songItemContainer}>
@@ -27,9 +28,13 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ song, onAddToList }
             </View>
             <View style={styles.actionsContainer}>
                 <View style={styles.divider} />
-                <TouchableOpacity style={styles.addButton} onPress={() => onAddToList(song.id)}>
-                    <MaterialIcons name="add" size={24} color="#fff" />
-                </TouchableOpacity>
+                {isAdded ? (
+                    <MaterialIcons name="check" size={24} color="#1DB954" />
+                ) : (
+                    <TouchableOpacity style={styles.addButton} onPress={() => onAddToList(song.id)}>
+                        <MaterialIcons name="add" size={24} color="#fff" />
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );

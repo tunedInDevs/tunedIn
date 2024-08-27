@@ -1,38 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, SafeAreaView, StyleSheet, FlatList } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 import { getUserRatedTracks } from '@/scripts/me/getUserRatedTracks';
-import {removeRatedTrack} from "@/scripts/me/removeRatedTracks";
-import ListItem from "@/components/ListItem";
+import { removeRatedTrack } from '@/scripts/me/removeRatedTracks';
+import ListItem from '@/components/ListItem';
 
 export default function List() {
     const [ratedTracks, setRatedTracks] = useState<any[]>([]);
 
-    useEffect(() => {
-        const fetchRatedTracks = async () => {
-            try {
-                const tracks = await getUserRatedTracks();
-                setRatedTracks(tracks);
-            } catch (error) {
-                console.error('Failed to fetch rated tracks:', error.message);
-            }
-        };
+    const fetchRatedTracks = async () => {
+        try {
+            const tracks = await getUserRatedTracks();
+            setRatedTracks(tracks);
+        } catch (error) {
+            console.error('Failed to fetch rated tracks:', error.message);
+        }
+    };
 
-        fetchRatedTracks();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchRatedTracks(); // Refetch the list whenever the screen comes into focus
+        }, [])
+    );
 
     const handleDeleteItem = async (trackId: string) => {
         try {
             await removeRatedTrack(trackId);
-            setRatedTracks(prevTracks => prevTracks.filter(track => track.id !== trackId));
+            await fetchRatedTracks(); // Refetch the list after deletion
         } catch (error) {
             console.error('Failed to delete track:', error.message);
         }
     };
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <FlatList
                 data={ratedTracks}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.track.id}
                 renderItem={({ item }) => (
                     <ListItem song={item} handleDeleteItem={handleDeleteItem} />
                 )}
@@ -58,4 +62,3 @@ const styles = StyleSheet.create({
         color: '#666',
     },
 });
-
