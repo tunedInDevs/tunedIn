@@ -16,7 +16,7 @@ jobs:
           node-version: '14.x'
 
       - name: Install dependencies
-        working-directory: ./cdk
+        working-directory: cdk
         run: npm ci
 
       - name: Install CDK
