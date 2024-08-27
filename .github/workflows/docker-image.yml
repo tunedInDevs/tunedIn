@@ -24,4 +24,4 @@ jobs:
         with:
           push: true
           file: ./server/Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tunedInDev:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tunedindev:latest
