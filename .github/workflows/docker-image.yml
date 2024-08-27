@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up working directory
+        run: cd server
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
