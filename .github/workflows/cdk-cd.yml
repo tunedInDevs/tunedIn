@@ -20,7 +20,7 @@ jobs:
         run: npm ci
 
       - name: Install CDK
-        working-directory: ./cdk
+        working-directory: cdk
         run: npm install -g aws-cdk
 
       - name: Configure AWS credentials
@@ -31,10 +31,10 @@ jobs:
           aws-region: us-west-2  # Replace with your preferred region
 
       - name: CDK Synth
-        working-directory: ./cdk
+        working-directory: cdk
         run: cdk synth
 
       - name: CDK Deploy
         if: github.event_name == 'push'
-        working-directory: ./cdk
+        working-directory: cdk
         run: cdk deploy --all --require-approval never
