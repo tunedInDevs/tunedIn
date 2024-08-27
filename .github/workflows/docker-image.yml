@@ -25,5 +25,5 @@ jobs:
         with:
           context: ./server
           push: true
-          file: Dockerfile
+          file: ./server/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tunedindev:latest
