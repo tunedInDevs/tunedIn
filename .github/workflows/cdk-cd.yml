@@ -30,6 +30,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           aws-region: us-west-2  # Replace with your preferred region
 
+      - name: CDK Bootstrap
+        working-directory: cdk
+        run: cdk bootstrap
+      
       - name: CDK Synth
         working-directory: cdk
         run: cdk synth
