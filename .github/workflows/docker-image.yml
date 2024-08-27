@@ -22,7 +22,7 @@ jobs:
       - name: Build and push register app
         uses: docker/build-push-action@v3
         with:
-          working-directory: ./server
+          context: ./server
           push: true
           file: Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tunedindev:latest
