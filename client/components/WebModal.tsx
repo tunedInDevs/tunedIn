@@ -14,7 +14,6 @@ export default function WebModal({ url, visible, onClose }: WebModalProps) {
 
     const handleNavigationStateChange = (navState: any) => {
         const { url: currentUrl } = navState;
-        console.log(currentUrl)
         // Check if the current URL matches the callback URL
         if (currentUrl.includes('/callback?code=')) {  // Adjust 'yourapp://callback' to your actual callback scheme
             // Extract the 'code' parameter from the URL
