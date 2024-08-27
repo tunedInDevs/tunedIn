@@ -16,9 +16,11 @@ jobs:
           node-version: '14.x'
 
       - name: Install dependencies
+        working-directory: ./cdk
         run: npm ci
 
       - name: Install CDK
+        working-directory: ./cdk
         run: npm install -g aws-cdk
 
       - name: Configure AWS credentials
