@@ -29,12 +29,10 @@ jobs:
           aws-region: us-west-2  # Replace with your preferred region
 
       - name: CDK Synth
-        with:
-          context: ./cdk
+        working-directory: ./cdk
         run: cdk synth
 
       - name: CDK Deploy
         if: github.event_name == 'push'
-        with:
-          context: ./cdk
+        working-directory: ./cdk
         run: cdk deploy --all --require-approval never
