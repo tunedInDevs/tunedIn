@@ -25,12 +25,7 @@ export default function Callback() {
         try {
             const loginResponse = await handleSpotifyCallback(code);
 
-            // Store the token securely
             await SecureStore.setItemAsync('spotify_jwt', loginResponse.token);
-
-            console.log('Token stored successfully:', loginResponse.token);
-
-            // Navigate to Home screen after successful authentication
             navigation.navigate('(Home)');
         } catch (error) {
             console.error('Authentication failed:', error.message);
@@ -44,9 +39,7 @@ export default function Callback() {
             {loading ? (
                 <ActivityIndicator size="large" color="#0000ff" />
             ) : (
-                <Text style={styles.text}>
-                    {code ? `Code: ${code}` : 'No code received'}
-                </Text>
+                <Text/>
             )}
         </View>
     );

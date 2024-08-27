@@ -1,12 +1,44 @@
-import React from 'react';
-import { Text, View, SafeAreaView, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, SafeAreaView, StyleSheet, FlatList } from 'react-native';
+import { getUserRatedTracks } from '@/scripts/me/getUserRatedTracks';
+import {removeRatedTrack} from "@/scripts/me/removeRatedTracks";
+import ListItem from "@/components/ListItem";
 
 export default function List() {
+    const [ratedTracks, setRatedTracks] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchRatedTracks = async () => {
+            try {
+                const tracks = await getUserRatedTracks();
+                setRatedTracks(tracks);
+            } catch (error) {
+                console.error('Failed to fetch rated tracks:', error.message);
+            }
+        };
+
+        fetchRatedTracks();
+    }, []);
+
+    const handleDeleteItem = async (trackId: string) => {
+        try {
+            await removeRatedTrack(trackId);
+            setRatedTracks(prevTracks => prevTracks.filter(track => track.id !== trackId));
+        } catch (error) {
+            console.error('Failed to delete track:', error.message);
+        }
+    };
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                <Text>List Screen</Text>
-            </View>
+            <FlatList
+                data={ratedTracks}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <ListItem song={item} handleDeleteItem={handleDeleteItem} />
+                )}
+                ListEmptyComponent={<Text style={styles.emptyText}>Your list is empty</Text>}
+                contentContainerStyle={styles.listContent}
+            />
         </SafeAreaView>
     );
 }
@@ -14,11 +46,16 @@ export default function List() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#fff', // Optional: Set background color to match your app's design
+        backgroundColor: '#fff',
     },
-    container: {
-        flex: 1,
-        justifyContent: 'center', // Optional: Center content vertically
-        alignItems: 'center', // Optional: Center content horizontally
+    listContent: {
+        padding: 16,
+    },
+    emptyText: {
+        textAlign: 'center',
+        marginTop: 20,
+        fontSize: 18,
+        color: '#666',
     },
 });
+
