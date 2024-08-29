@@ -9,23 +9,9 @@ export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create a secret for the Spotify client ID
-    const clientId = new secretsmanager.Secret(this, 'SpotifyClientId', {
-      secretName: 'spotify-client-id',
-      generateSecretString: {
-        secretStringTemplate: JSON.stringify({ CLIENT_ID: 'default-client-id' }),
-        generateStringKey: 'CLIENT_ID',
-      },
-    });
-
-    // Create a secret for the Spotify client secret
-    const clientSecret = new secretsmanager.Secret(this, 'SpotifyClientSecret', {
-      secretName: 'spotify-client-secret',
-      generateSecretString: {
-        secretStringTemplate: JSON.stringify({ CLIENT_SECRET: 'default-client-secret' }),
-        generateStringKey: 'CLIENT_SECRET',
-      },
-    });
+    // Reference existing secrets or create new ones if they don't exist
+    const clientId = this.getOrCreateSecret('spotify-client-id', 'SpotifyClientId');
+    const clientSecret = this.getOrCreateSecret('spotify-client-secret', 'SpotifyClientSecret');
 
     // Create a VPC
     const vpc = new ec2.Vpc(this, 'TunedInVPC', {
@@ -92,6 +78,24 @@ export class CdkStack extends cdk.Stack {
     // Output the load balancer DNS name
     new cdk.CfnOutput(this, 'LoadBalancerDNS', {
       value: lb.loadBalancerDnsName
+    });
+  }
+
+  private getOrCreateSecret(secretName: string, logicalId: string): secretsmanager.ISecret {
+    const existingSecret = secretsmanager.Secret.fromSecretNameV2(this, logicalId, secretName);
+
+    // Check if the secret exists
+    if (existingSecret.secretArn) {
+      return existingSecret;
+    }
+
+    // If the secret doesn't exist, create a new one
+    return new secretsmanager.Secret(this, logicalId, {
+      secretName: secretName,
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ value: 'default-value' }),
+        generateStringKey: 'value',
+      },
     });
   }
 }
